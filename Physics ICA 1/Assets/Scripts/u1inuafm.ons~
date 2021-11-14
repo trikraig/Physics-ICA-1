@@ -1,0 +1,131 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Ball : MonoBehaviour
+{
+    public Ball otherBall;
+
+    public float m_radius = 0.5f;
+    Vector3 m_initialPos;
+    public Vector3 m_velocity = new Vector3(0.75f, 0.75f, 0);
+    Vector3 gravity = new Vector3(0, -0.00f, 0);
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        m_initialPos = transform.position;
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        Vector3 pos = transform.position + m_velocity;
+        m_velocity += gravity;
+        transform.position = pos;
+
+        //Check for collisions
+        if (m_velocity != Vector3.zero)
+        {
+            //SphereToSphereCollision();
+            MotionSphereToSphereCollision();
+        }
+    }
+    void SphereToPlaneCollision()
+    {
+        //Check if sphere is heading towards the plane
+        // N = surface normal of plane
+        // V = Velocity vector of the sphere
+
+
+
+    }
+
+    void SphereToSphereCollision()
+    {
+        Vector3 a = otherBall.transform.position - transform.position; //vector from center of sphere 1 to center of sphere 2
+        float AMag = GetMagnitude(a);
+
+        Vector3 V = m_velocity; //Vector of motion of sphere 1 (this)
+        float angle = GetAngle(transform.position, otherBall.transform.position);
+
+        float radiiSum = m_radius + otherBall.m_radius;
+
+        // d = sin(q) * |A|
+        float d = Mathf.Sin(angle) * AMag;
+
+        if (d < radiiSum)
+        {
+            float e = Mathf.Sqrt((radiiSum * radiiSum) - (d * d));
+
+            float Vc = Mathf.Cos(angle) * GetMagnitude(a) - e;
+
+            if (d < Vc)
+            {
+                Debug.Log("Collision");
+                otherBall.m_velocity += m_velocity;
+                m_velocity = Vector3.zero;
+            }
+
+        }
+    }
+
+    void MotionSphereToSphereCollision()
+    {
+        //Need to find at what point in frame that they collide
+        // e.g. when distance between center of two spheres = sum of their radii (r1 + r2)
+
+        Vector3 P1 = transform.position; // start position vector of sphere 1.
+        Vector3 P2 = otherBall.transform.position; // start position vector of sphere 2
+        Vector3 V1 = m_velocity; //velocity vector of sphere 1
+        Vector3 V2 = otherBall.m_velocity; // velocity vector of sphere 2
+        float r1 = m_radius;
+        float r2 = otherBall.m_radius;
+
+        float dXp = P1.x - P2.x;
+        float dYp = P1.y - P2.y;
+        float dZp = P1.z - P2.z;
+        float dXv = V1.x - V2.x;
+        float dYv = V1.y - V2.y;
+        float dZv = V1.z - V2.z;
+
+        var A = (dXv * dXv) + (dYv * dYv) + (dZv * dZv);
+        var B = (2 * dXp * dXv) + (2 * dYp * dYv) + (2 * dZp * dZv);
+        var C = (dXp * dXp) + (dYp * dYp) + (dZp * dZp) - ((r1 + r2) * (r1 + r2));
+
+        bool collision = B * B > 4 * (A * C);
+        if (collision)
+        {
+            var sqrt = Mathf.Sqrt(B * B - 4 * (A * C));
+            var t1 = -B + sqrt / 2 * A;
+            var t2 = -B - sqrt / 2 * A;
+
+            Debug.Log("T1 = " + t1 + " and T2 = " + t2);
+
+            float minT = Mathf.Min(t1, t2);
+            if (minT < 0) 
+                m_velocity = Vector3(0,0,0);
+            
+            //multiply t by velocity vector
+        }
+        //if b^2 * 4AC is positive they will hit
+    }
+
+    float GetMagnitude(Vector3 vector)
+    {
+        float result = (vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z);
+        result = Mathf.Sqrt(result);
+        return result;
+    }
+
+    float GetAngle(Vector3 a, Vector3 b)
+    {
+        return DotProduct(a, b) / (GetMagnitude(a) * GetMagnitude(b));
+    }
+
+    float DotProduct(Vector3 a, Vector3 b)
+    {
+        return (a.x + a.y + a.z) + (b.x + b.y + b.z);
+    }
+}
