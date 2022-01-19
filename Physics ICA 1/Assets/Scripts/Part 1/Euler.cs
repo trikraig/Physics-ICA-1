@@ -4,20 +4,21 @@ using UnityEngine;
 
 public class Euler : MonoBehaviour
 {
-    Vector3 initialPos;
-    Vector3 velocity = new Vector3(0.75f, 0.75f, 0);
-    Vector3 gravity = new Vector3(0, -0.05f, 0);
+    Vector3 Gravity = new Vector3(0, -0.05f, 0);
 
-    // Start is called before the first frame update
-    void Start()
+    public int mass = 1;
+    public Vector3 force = new Vector3(0.75f, 0.75f, 0);    
+    private Vector3 velocity;   
+
+
+    private void Start()
     {
-        initialPos = transform.position;
+        velocity = new Vector3(force.x * mass, force.y * mass, force.z * mass);
     }
 
     private void FixedUpdate()
     {
-        Vector3 pos = transform.position + velocity;
-        velocity += gravity;
-        transform.position = pos;
+        velocity += Gravity;
+        transform.position += velocity;
     }
 }

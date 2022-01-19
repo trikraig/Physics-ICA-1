@@ -37,7 +37,7 @@ public class Ball : MonoBehaviour
         if (m_velocity != Vector3.zero)
         {
             //SphereToSphereCollision();
-            MotionSphereToSphereCollision();
+           // MotionSphereToSphereCollision();
 
             SphereToPlaneCollision();
         }   
@@ -46,7 +46,6 @@ public class Ball : MonoBehaviour
     {
         //Very rough collision check, to make better
         bool collided = transform.position.x > planeA.transform.position.x;
-
         if (collided)
         {
 
@@ -61,12 +60,13 @@ public class Ball : MonoBehaviour
 
             //Normal is cross product of these two vectors.
             Vector3 N = CrossProduct(V1, V2);
+            
+            float scaler = DotProduct(N, -Va.normalized);
 
-            Vector3 VbNoramlised = 2 * N * (DotProduct(N, -Va.normalized)) + Va.normalized;
+            //Gives a direction
+            Vector3 newDirection = (2 * N) * (scaler) + Va.normalized;
 
-            Vector3 Vb = VbNoramlised * GetMagnitude(Va);
-
-            m_velocity = Vb;
+            m_velocity = newDirection.normalized;
         }
     }
 
@@ -119,7 +119,7 @@ public class Ball : MonoBehaviour
                 //Vector3 G = P2 - P2CollisionPoint;
                 //otherBall.m_velocity = G;
 
-                Vector3 G = (P2CollisionPoint - P1CollisionPoint).normalized;
+                Vector3 G = (P2CollisionPoint - P1CollisionPoint).normalized * m_radius;
                 /*
                                 newVelocity.x *= 0.01f;
                                 newVelocity.y *= 0.01f;

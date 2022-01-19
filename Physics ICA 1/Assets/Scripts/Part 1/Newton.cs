@@ -9,25 +9,18 @@ public class Newton : MonoBehaviour
     /*public*/ Vector3 initialVelocity = new Vector3(10, 10, 0);
     Vector3 gravity = new Vector3(0, -9.8f, 0);
 
-    float currentTime;
     int currentFrame = 0;
-    int FPS = 60;
+    const int FPS = 30;
 
     // Start is called before the first frame update
     void Start()
     {
         initialPos = transform.position;
-        currentTime = Time.time;
     }
 
     private void FixedUpdate()
     {
-        float deltaTime = GetDeltaTime();
-
-        //SimpleDisplacement(deltaTime);
-
-        DisplacementConstantAcceleration(deltaTime);
-
+        DisplacementConstantAcceleration(GetDeltaTime());
     }
     
     void SimpleDisplacement(float dt)
