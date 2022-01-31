@@ -7,11 +7,13 @@ public class BasicBall : MonoBehaviour
     Vector3 Gravity = new Vector3(0, -0.05f, 0);
     public Vector3 m_velocity;
     public float m_radius = 5.0f;
+    public bool m_affectedByGravity = false;
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        //m_velocity += Gravity;
+        if (m_affectedByGravity) m_velocity += Gravity;
+
         transform.position += m_velocity;
     }
 

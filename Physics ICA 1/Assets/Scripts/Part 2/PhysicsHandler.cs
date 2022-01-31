@@ -14,8 +14,10 @@ public class PhysicsHandler : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //For demo purposes, only these two balls can collide
         MotionSphereToSphereCollision(m_collideball, m_collideOtherBall);
-        CheckSphereToPlaneCollision(m_ballPlane);     
+        //For demo purposes, only this ball will collide with plane
+        CheckSphereToPlaneCollision(m_ballPlane);
     }
 
     void MotionSphereToSphereCollision(GameObject ballA, GameObject ballB)
@@ -102,7 +104,8 @@ public class PhysicsHandler : MonoBehaviour
         float q1 = Vector3.Angle(planeNormal, P);
 
         //q1 we already have, q2 is the angle between P and the plane.
-        float q2 = 90 - q1;
+        float q2 = (90 - q1);
+        q2 *= Mathf.Deg2Rad;
 
         // Find d = sin(q2) * |P|
         // The closest distance between the start position of the sphere and the plane
@@ -111,20 +114,23 @@ public class PhysicsHandler : MonoBehaviour
         //Now need to find the distance to the point of contact between the sphere and the plane
         BasicBall ball = ballObject.GetComponent<BasicBall>();
         Vector3 v = ball.GetVelocity();
-        float r = ball.m_radius;
-        float s = Vector3.Angle(v, -planeNormal);
 
         // Need to find Vc, vector from the current sphere position to the collision position
-        float distanceToContact = (d - r) / Mathf.Cos(s);
+        float s = Vector3.Angle(v, -planeNormal);
+        float vc = (d - ball.m_radius) / Mathf.Cos(s);
 
         // If result less than magnitude of velocity vector, then sphere in contact with plane
-        if (Mathf.Abs(distanceToContact) <= v.magnitude) 
+        if (vc <= v.magnitude) 
         {
-            //Handle Collision
+            //Handle Collision - 0 - 1 elasticity. 
+            float coefficient = 0.75f;
             planeNormal.Normalize();
             Vector3 vb = 2 * planeNormal * Vector3.Dot(planeNormal, -v.normalized) + v.normalized;
-            vb *= v.magnitude;
+            vb *= (v.magnitude * coefficient);
             ball.SetVelocity(vb);
+
+           // To avoid ball sinking
+           ball.transform.position += (v.normalized * vc);
         }
     }
 
